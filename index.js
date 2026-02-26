@@ -16,12 +16,15 @@ async function main() {
   await client.connect();//接続する(非同期関数ー＞成功するかわからないのでawaitで待つ)
 
   const db = client.db('my-app');
-
-  app.get('/', async (req, res) => {//npm install ejsが必要
+  async function getUsers(db) {
     //users配列の中はオブジェクト
     const users = await db.collection('user').find().toArray();//users:データベースからとってきた値(find())をtoArray()
     //map:配列の中の要素を一つずつ取り出して、新しい配列を作る
     const names = users.map((user) => { return user.name });
+    return {names};
+  }
+  app.get('/', async (req, res) => {//npm install ejsが必要
+    const names = await getUsers(db);
     res.render(path.resolve(__dirname, 'views/index.ejs'), { users: names });
   });
 

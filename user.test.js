@@ -1,7 +1,7 @@
 const { test } = require('node:test');
 const assert = require('node:assert');
 
-const { insertUser } = require('./user');
+const { insertUser, getUsers } = require('./user');
 
 test('insertUser', async (t) => {
   const insertOne = t.mock.fn();
@@ -15,4 +15,27 @@ test('insertUser', async (t) => {
   assert.strictEqual(body, 'Created', '正しくデータが挿入された場合、Createdを返す');
   assert.strictEqual(insertOne.mock.callCount(), 1, '1度だけinsertOneが呼ばれる');
   
+});
+
+test('getUsers', async (t) =>{
+    const db = {
+        collection: () => {
+            return {
+                find: () => {
+                    return {
+                        toArray: () => {
+                            return [
+                                { name: 'aaaa' },
+                                { name: 'bbbb' },
+                                { name: 'cccc' }
+                            ];
+                        }
+                    }
+                }
+            }
+        }
+    };
+    const { names } = await getUsers(db);
+    assert.deepEqual(names.length, 3, 'データベースから3件のデータを取り出して返却する');
+    assert.deepEqual(names[0],'aaaa', '配列の0番目が名前の文字列になっていること')
 });

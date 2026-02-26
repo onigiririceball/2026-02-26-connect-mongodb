@@ -13,3 +13,12 @@ async function insertUser(name, db) {
 }
 
 exports.insertUser = insertUser;
+
+async function getUsers(db) {
+    //users配列の中はオブジェクト
+    const users = await db.collection('user').find().toArray();//users:データベースからとってきた値(find())をtoArray()
+    //map:配列の中の要素を一つずつ取り出して、新しい配列を作る
+    const names = users.map((user) => { return user.name });
+    return {names};
+}
+exports.getUsers = getUsers;
