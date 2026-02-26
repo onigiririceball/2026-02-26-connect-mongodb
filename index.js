@@ -4,6 +4,7 @@
 const express = require('express');//express:サーバーを立ち上げる大元のライブラリ
 const { MongoClient } = require('mongodb');
 const path = require('path');
+const { insertUser } = require('./user')
 const app = express();//expressを使ってサーバーを立ち上げる
 app.set('view engine', 'ejs');//ejsを使ってテンプレートを表示する
 const client = new MongoClient('mongodb://localhost:27017');//どのmongodbに繋ぐか
@@ -24,16 +25,14 @@ async function main() {
     res.render(path.resolve(__dirname, 'views/index.ejs'), { users: names });
   });
 
+
+
   //post:データベースにデータを追加する
   //api/userにデータを送信する
   app.post('/api/user', express.json(), async (req, res) => {
     const name = req.body.name;//ユーザのリクエストの中にnameが入っていたらそれを取り出して入れる
-    if (!name) {
-      res.status(400).send('Bad Request');//Bad Request:リクエストが不正な場合
-      return;
-    }
-    await db.collection('user').insertOne({ name: name });
-    res.status(200).send('Created');
+    const { status, body } = await insertUser(name, db);
+    res.status(status).send(body);
   });
 
   app.listen(3000, () => {
