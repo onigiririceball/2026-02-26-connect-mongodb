@@ -5,6 +5,7 @@ const express = require('express');//express:サーバーを立ち上げる大�
 const { MongoClient } = require('mongodb');
 const path = require('path');
 const { insertUser } = require('./user')
+const {getUsers} = require('./user')
 const app = express();//expressを使ってサーバーを立ち上げる
 app.set('view engine', 'ejs');//ejsを使ってテンプレートを表示する
 const client = new MongoClient('mongodb://localhost:27017');//どのmongodbに繋ぐか
@@ -16,13 +17,7 @@ async function main() {
   await client.connect();//接続する(非同期関数ー＞成功するかわからないのでawaitで待つ)
 
   const db = client.db('my-app');
-  async function getUsers(db) {
-    //users配列の中はオブジェクト
-    const users = await db.collection('user').find().toArray();//users:データベースからとってきた値(find())をtoArray()
-    //map:配列の中の要素を一つずつ取り出して、新しい配列を作る
-    const names = users.map((user) => { return user.name });
-    return {names};
-  }
+
   app.get('/', async (req, res) => {//npm install ejsが必要
     const names = await getUsers(db);
     res.render(path.resolve(__dirname, 'views/index.ejs'), { users: names });

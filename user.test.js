@@ -39,3 +39,31 @@ test('getUsers', async (t) =>{
     assert.deepEqual(names.length, 3, 'データベースから3件のデータを取り出して返却する');
     assert.deepEqual(names[0],'aaaa', '配列の0番目が名前の文字列になっていること')
 });
+
+test('getUsers: error', async (t) => {
+    const toArray = t.mock.fn(() => {
+      throw new Error('something error');
+    });
+    const db = {
+        collection: () => {
+          return {
+             find: () => {
+               return { toArray };
+             }
+           };
+        },
+      };
+    
+
+    // assertの数をカウントする
+    t.plan(1);
+    try {
+        await getUsers(db);
+        // 絶対に失敗するassertを書く方法もある
+        assert(true, false);
+      } catch (e) {
+        // テスト内でassertの回数がカウントできるようにする
+        t.assert.strictEqual(e.message, 'something error');
+      }
+    
+});
