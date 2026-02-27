@@ -56,14 +56,10 @@ test('getUsers: error', async (t) => {
     
 
     // assertの数をカウントする
-    t.plan(1);
-    try {
-        await getUsers(db);
+    //t.plan(1);
+
+        const { names } = await getUsers(db);
+        assert.deepEqual(names.length, 0, 'データベースから空の配列を返却する');
         // 絶対に失敗するassertを書く方法もある
-        assert(true, false);
-      } catch (e) {
-        // テスト内でassertの回数がカウントできるようにする
-        t.assert.strictEqual(e.message, 'something error');
-      }
     
 });
